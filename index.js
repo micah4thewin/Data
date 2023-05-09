@@ -1,32 +1,33 @@
 const fs = require('fs');
-const questionData = require('./Questions/data.js');
-const squadData = require('./SQuAD/data.js');
+const questionData = require('./questions/data.js');
+const squadData = require('./squad/data.js');
 const coqaData = require('./coqa/data.js');
+const jeopardyData = require('./jeapordy/data.js');
 
 const newData = {
-  topics:[]
+  topics: []
 };
 
 let totalCategories = 0;
 let totalQuestions = 0;
 let totalAnswers = 0;
 
-const datasets = [questionData, squadData, coqaData];
+const datasets = [questionData, squadData, coqaData, jeopardyData];
 
 for (const dataset of datasets) {
-  for (const category of dataset.categories) {
+  for (const category of dataset.topics) {
     totalCategories++;
-    totalQuestions += category.questions.length;
-    for (const question of category.questions) {
-      if (question.answer) {
+    totalQuestions += category.prompts.length;
+    for (const question of category.prompts) {
+      if (question.reply) {
         totalAnswers++;
       }
     }
     const newCategory = {
-      category: category.category,
-      questions: category.questions
+      topic: category.topic,
+      prompts: category.prompts
     };
-    newData.categories.push(newCategory);
+    newData.topics.push(newCategory);
   }
 }
 
