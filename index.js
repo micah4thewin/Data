@@ -4,7 +4,7 @@ const squadData = require('./squad/data.js');
 const coqaData = require('./coqa/data.js');
 const jeopardyData = require('./jeapordy/data.js');
 const wikiqaData = require('./wikiqa/data.js');
-const humorData = require('./humor/data.js'); // Add this line
+const humorData = require('./humor/data.js');
 
 const newData = {
   topics: []
@@ -14,21 +14,67 @@ let totalCategories = 0;
 let totalQuestions = 0;
 let totalAnswers = 0;
 
-const datasets = [data, squadData, coqaData, jeopardyData, wikiqaData, humorData]; // Add humorData here
+const datasets = [data, squadData, coqaData, jeopardyData, wikiqaData, humorData];
+
+function removeSpecialCharacters(text) {
+  // Remove non-standard punctuation, backslashes, double quotes, single quotes, parentheses, semicolons, and colons
+  let newText = text.replace(/[\\'"\(\);:]/g, '');
+
+  // Replace occurrences of '. . .' and '. ..' with '...'
+  newText = newText.replace(/(\. ){2,}\./g, '...');
+
+  // Remove extra spaces around commas
+  newText = newText.replace(/ , | ,/g, ',');
+
+  // Remove ' -- ' and replace with a single space
+  newText = newText.replace(/ -- /g, ' ');
+
+  // Remove line breaks and carriage returns, replacing them with a single space
+  newText = newText.replace(/[\n\r]+/g, ' ');
+
+  // Remove double spaces
+  newText = newText.replace(/\s{2,}/g, ' ');
+
+  // Remove any HTML or markup characters
+  newText = newText.replace(/<[^>]*>/g, '');
+
+  // Remove Wikipedia markup, such as '{{...}}' and '[[...]]'
+  newText = newText.replace(/(\{\{|\[\[)[^}\]]*(\}\}|\]\])/g, '');
+
+  // Remove remaining special characters, including Unicode characters
+  newText = newText.replace(/[^\x20-\x7E]+/g, '');
+
+  // Decode any HTML entities
+  newText = newText.replace(/&[^;]+;/g, (match) => {
+    const el = document.createElement('div');
+    el.innerHTML = match;
+    return el.innerText;
+  });
+
+  return newText;
+}
+
+
 
 for (const dataset of datasets) {
   for (const category of dataset.topics) {
     totalCategories++;
     totalQuestions += category.prompts.length;
-    for (const question of category.prompts) {
-      if (question.reply) {
-        totalAnswers++;
-      }
-    }
+    const cleanPrompts = category.prompts.map(prompt => {
+      const cleanQuestion = removeSpecialCharacters(prompt.prompt);
+      const cleanReply = prompt.reply ? removeSpecialCharacters(prompt.reply) : null;
+      return {
+        prompt: cleanQuestion,
+        reply: cleanReply
+      };
+    });
+    totalAnswers += cleanPrompts.filter(prompt => prompt.reply).length;
+
     const newCategory = {
-      topic: category.topic,
-      prompts: category.prompts
+      topic: removeSpecialCharacters(category.topic),
+      prompts: cleanPrompts
     };
+
     newData.topics.push(newCategory);
   }
 }
