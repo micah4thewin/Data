@@ -1,4 +1,4 @@
-const questionData = {
+const data = {
 topics:[
 {
       "topic": "Weather Forecasts and Conditions",
@@ -28974,4 +28974,4 @@ topics:[
   ]
 };
 
-module.exports = questionData;
+module.exports = data;

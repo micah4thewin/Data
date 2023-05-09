@@ -1,8 +1,10 @@
 const fs = require('fs');
-const questionData = require('./questions/data.js');
+const data = require('./questions/data.js');
 const squadData = require('./squad/data.js');
 const coqaData = require('./coqa/data.js');
 const jeopardyData = require('./jeapordy/data.js');
+const wikiqaData = require('./wikiqa/data.js');
+const humorData = require('./humor/data.js'); // Add this line
 
 const newData = {
   topics: []
@@ -12,7 +14,7 @@ let totalCategories = 0;
 let totalQuestions = 0;
 let totalAnswers = 0;
 
-const datasets = [questionData, squadData, coqaData, jeopardyData];
+const datasets = [data, squadData, coqaData, jeopardyData, wikiqaData, humorData]; // Add humorData here
 
 for (const dataset of datasets) {
   for (const category of dataset.topics) {
